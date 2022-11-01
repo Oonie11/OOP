@@ -27,18 +27,19 @@ const Car = function (make, speed) {
 
 //todo accelerate method of Car
 Car.prototype.accelerate = function () {
-  console.log('accelerated speed: ', (this.speed += 10));
+  return console.log('accelerated speed: ', (this.speed += 10));
 };
 
 //todo brake method of Car
 Car.prototype.brake = function () {
-  console.log('reduced speed', (this.speed -= 5));
+  return console.log('reduced speed', (this.speed -= 5));
 };
 
 //todo make EV as child class of Car
 const EV = function (make, speed, charge) {
-  this.make = make;
-  this.speed = speed;
+  // this.make = make;
+  // this.speed = speed;
+  Car.call(this, make, speed);
   this.charge = charge;
 };
 
@@ -46,7 +47,7 @@ EV.prototype = Object.create(Car.prototype);
 
 EV.prototype.accelerate = function () {
   this.speed += 20;
-  this.charge -= 1;
+  this.charge--;
   console.log(
     `Tesla going at ${this.speed}km/h, with a charge of ${this.charge}%`
   );
