@@ -1,140 +1,83 @@
 'use strict';
-
 //! //////////////////////////////////////////////////
-//* Inheritance Between Classes
-//! //////////////////////////////////////////////////
-const Person = function (firstName, birthYear) {
-  this.firstName = firstName;
-  this.birthYear = birthYear;
-};
-
-Person.prototype.calcAge = function () {
-  console.log(2037 - this.birthYear);
-};
-
-const Student = function (firstName, birthYear, course) {
-  // this.firstName = firstName;
-  // this.birthYear = birthYear;
-  Person.call(this, firstName, birthYear);
-  this.course = course;
-};
-
-//linking prototypes
-Student.prototype = Object.create(Person.prototype);
-
-Student.prototype.introduce = function () {
-  console.log(`hello my name is ${this.firstName} and I study ${this.course}`);
-};
-
-const mike = new Student('Mike', 2020, 'Computer Science');
-mike.introduce();
-mike.calcAge();
-
-console.log(mike instanceof Student);
-console.log(mike instanceof Person);
-console.log(mike instanceof Object);
-
-console.log(mike.__proto__);
-console.log(mike.__proto__.__proto__);
-Student.prototype.constructor = Student;
-console.dir(Student.prototype.constructor);
-
-//! //////////////////////////////////////////////////
-//* Inheritance Between Classes: Using ES06
+//* More Classes Examples
 //! //////////////////////////////////////////////////
 
-class PersonCl {
-  //constructor Function
-  constructor(fullName, birthYear) {
-    this.fullName = fullName;
-    this.birthYear = birthYear;
+//! //////////////////////////////////////////////////
+//* Encapsulation and Data-Privacy
+//! //////////////////////////////////////////////////
+
+//01 public fields
+//02 private fields
+//03 public methods
+//04 private methods
+//(there are also static methods)
+
+class Account {
+  //01 Public fields (instances)
+  locale = navigator.language;
+
+  //02 private fields
+  #movements = [];
+  #pin;
+
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    //protected Property
+    this.#pin = pin;
+    //protected Property
+    //! adding "_" simply denotes that this property is suppose to be private and should not be accessed outside the class
+    // this._movements = [];
+    // this.locale = navigator.language;
+    console.log(`thanks for opening an account ${owner}`);
   }
 
-  //!writing instance methods
-  calcAge() {
-    console.log(2037 - this.birthYear);
+  //03 public methods
+  //public interface
+
+  getMovement() {
+    return this.#movements;
   }
 
-  get age() {
-    return 2037 - this.birthYear;
+  deposit(val) {
+    this.#movements.push(val);
+    return this;
   }
 
-  //set a property that already exist
-  //using an underscore in this._fullName to avoid name conflict with this.fullName
-  set fullName(name) {
-    if (name.includes(' ')) this._fullName = name;
-    else alert(`${name} is not a full name.`);
+  withdraw(val) {
+    this.deposit(-val);
+    return this;
   }
 
-  get fullName() {
-    return this._fullName;
+  requestLoan(val) {
+    // if (this.#approveLoan(val)) {
+    if (this._approveLoan(val)) {
+      this.deposit(val);
+      console.log(`loan approved`);
+      return this;
+    }
   }
 
-  //!static method
-  //* static methods will only not be inherited in the prototype. It is specific to the constructor
-  static hey() {
-    console.log('hey there 🖐');
-    console.log(this);
+  //04 private methods
+  //protected Property
+  // #approveLoan(val) {
+  _approveLoan(val) {
+    return true;
+  }
+
+  static helper() {
+    console.log(`helper`);
   }
 }
 
-//the extends link prototypes of studentCl to PersonCl
-class StudentCl extends PersonCl {
-  constructor(fullName, birthYear, course) {
-    //super is constructor function of the parent class
-    //* Always need to happen first!
-    super(fullName, birthYear);
-    this.course = course;
-  }
+const acc1 = new Account('Jonas', 'EUR', 1111);
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
 
-  introduce = function () {
-    console.log(`hello my name is ${this.fullName} and I study ${this.course}`);
-  };
+console.log('acc1', acc1);
+Account.helper();
 
-  //modifying the calcAge method from parent  class
-  calcAge() {
-    console.log(
-      `I am ${
-        2037 - this.birthYear
-      } year old. But as a student I feel like I am ${
-        2037 - this.birthYear + 10
-      } years old`
-    );
-  }
-}
-
-const martha = new StudentCl('Martha Jones', 2012, 'Computer Science');
-martha.introduce();
-martha.calcAge();
-
-//! //////////////////////////////////////////////////
-//* Inheritance Between Classes: Object.create()
-//! //////////////////////////////////////////////////
-
-const PersonProto = {
-  calcAge() {
-    console.log(2037 - this.birthYear);
-  },
-  init(firstName, birthYear) {
-    this.firstName = firstName;
-    this.birthYear = birthYear;
-  },
-};
-
-// const steven = Object.create(PersonProto);
-
-const StudentProto = Object.create(PersonProto);
-
-StudentProto.init = function (firstName, birthYear, course) {
-  PersonProto.init.call(this, firstName, birthYear);
-  this.course = course;
-};
-
-StudentProto.introduce = function () {
-  console.log(`hello my name is ${this.firstName} and I study ${this.course}`);
-};
-
-const jay = Object.create(StudentProto);
-jay.init('Jay', 2010, 'Computer Science');
-jay.introduce();
-jay.calcAge();
+//Chaining
+acc1.deposit(300).deposit(500).withdraw(35).requestLoan(25000).withdraw(4000);
